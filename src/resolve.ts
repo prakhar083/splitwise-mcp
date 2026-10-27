@@ -55,23 +55,30 @@ export function groupCandidate(group: Group): Candidate<Group> {
   return { id: group.id, names: [group.name], label: `${group.name} (id ${group.id})`, value: group };
 }
 
-/** Levenshtein distance, capped for speed: returns cap + 1 once it is exceeded. */
+/**
+ * Optimal-string-alignment edit distance: insertions, deletions, substitutions
+ * and adjacent transpositions ("patle" -> "patel") each cost 1. Returns cap + 1
+ * as soon as the distance is known to exceed `cap`.
+ */
 export function editDistance(a: string, b: string, cap = 3): number {
   if (Math.abs(a.length - b.length) > cap) return cap + 1;
-  let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+  let prevPrev: number[] = [];
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
   for (let i = 1; i <= a.length; i++) {
     const curr = [i];
     let rowMin = i;
     for (let j = 1; j <= b.length; j++) {
       const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      const value = Math.min(prev[j]! + 1, curr[j - 1]! + 1, prev[j - 1]! + cost);
+      let value = Math.min(prev[j]! + 1, curr[j - 1]! + 1, prev[j - 1]! + cost);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) value = Math.min(value, prevPrev[j - 2]! + 1);
       curr.push(value);
       rowMin = Math.min(rowMin, value);
     }
     if (rowMin > cap) return cap + 1;
+    prevPrev = prev;
     prev = curr;
   }
-  return prev[b.length]!;
+  return Math.min(prev[b.length]!, cap + 1);
 }
 
 /** Typos allowed for a query of this length: none for short names, where a typo is usually another name. */
