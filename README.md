@@ -1,7 +1,6 @@
 # splitwise-mcp
 
 [![CI](https://github.com/prakhar083/splitwise-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/prakhar083/splitwise-mcp/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/splitwise-mcp.svg)](https://www.npmjs.com/package/splitwise-mcp)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 An [MCP](https://modelcontextprotocol.io) server for [Splitwise](https://www.splitwise.com). Claude Desktop, Claude Code, Cursor and any other MCP client can use it to read balances, log expenses, split bills and record settle-ups, all from a plain-language request.
@@ -64,7 +63,7 @@ Edit `claude_desktop_config.json` (macOS: `~/Library/Application Support/Claude/
   "mcpServers": {
     "splitwise": {
       "command": "npx",
-      "args": ["-y", "splitwise-mcp"],
+      "args": ["-y", "github:prakhar083/splitwise-mcp"],
       "env": {
         "SPLITWISE_API_KEY": "your-api-key"
       }
@@ -78,7 +77,7 @@ Restart Claude Desktop.
 ### Claude Code
 
 ```sh
-claude mcp add --transport stdio --env SPLITWISE_API_KEY=your-api-key splitwise -- npx -y splitwise-mcp
+claude mcp add --transport stdio --env SPLITWISE_API_KEY=your-api-key splitwise -- npx -y github:prakhar083/splitwise-mcp
 ```
 
 Add `--scope user` to make it available in every project.
@@ -92,7 +91,7 @@ Add to `~/.cursor/mcp.json` (all projects) or `.cursor/mcp.json` (one project):
   "mcpServers": {
     "splitwise": {
       "command": "npx",
-      "args": ["-y", "splitwise-mcp"],
+      "args": ["-y", "github:prakhar083/splitwise-mcp"],
       "env": {
         "SPLITWISE_API_KEY": "your-api-key"
       }
@@ -106,7 +105,7 @@ Add to `~/.cursor/mcp.json` (all projects) or `.cursor/mcp.json` (one project):
 For clients that connect over HTTP instead of stdio:
 
 ```sh
-SPLITWISE_API_KEY=your-api-key npx -y splitwise-mcp --http --port 3000
+SPLITWISE_API_KEY=your-api-key npx -y github:prakhar083/splitwise-mcp --http --port 3000
 # MCP endpoint: http://127.0.0.1:3000/mcp
 ```
 
