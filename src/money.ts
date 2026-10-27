@@ -52,7 +52,7 @@ const DECIMAL = /^([+-])?(\d*)(?:\.(\d*))?$/;
  */
 export function parseAmount(input: string | number, currency: string, options: { allowZero?: boolean } = {}): bigint {
   const exponent = currencyExponent(currency);
-  const text = typeof input === 'number' ? numberToPlainString(input) : input.trim().replace(/[,_\s]/g, '');
+  const text = typeof input === 'number' ? numberToPlainString(input) : stripGrouping(input);
   const match = DECIMAL.exec(text);
   if (!match || (match[2] === '' && (match[3] ?? '') === '')) {
     throw new MoneyError(`"${input}" is not a valid amount.`);
@@ -86,6 +86,17 @@ export function parseApiAmount(input: string | number | null | undefined, curren
   const next = frac.charAt(exponent);
   if (next !== '' && Number(next) >= 5) minor += 1n;
   return sign === '-' ? -minor : minor;
+}
+
+/**
+ * Removes thousands separators, but only in the unambiguous "1,234,567.89"
+ * form. "1,5" could mean 1.5 or 15, so it is rejected rather than guessed.
+ */
+function stripGrouping(input: string): string {
+  const text = input.trim().replace(/\s/g, '');
+  if (!text.includes(',')) return text;
+  if (/^[+-]?\d{1,3}(,\d{3})+(\.\d*)?$/.test(text)) return text.replace(/,/g, '');
+  throw new MoneyError(`"${input}" is ambiguous. Use a dot for decimals and no separators, e.g. 1234.50.`);
 }
 
 /** Formats minor units as a plain decimal string ("1234" USD -> "12.34"). */
